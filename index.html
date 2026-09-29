@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Phone — My Little World</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    :root {
+      --blue: #b9dff2;
+      --blue-light: #e8f6fc;
+      --pink: #f3c9dc;
+      --pink-light: #fff0f6;
+      --white: #ffffff;
+      --text: #263746;
+      --muted: #788894;
+      --shadow: rgba(55, 72, 88, 0.18);
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(185,223,242,.65), transparent 28%),
+        radial-gradient(circle at 85% 80%, rgba(243,201,220,.7), transparent 30%),
+        linear-gradient(135deg, #f8fcff, #fff8fb);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      color: var(--text);
+    }
+
+    /* BACKGROUND */
+
+    .background-orb {
+      position: fixed;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: .45;
+      pointer-events: none;
+    }
+
+    .orb-blue {
+      background: var(--blue);
+      top: -100px;
+      left: -80px;
+    }
+
+    .orb-pink {
+      background: var(--pink);
+      bottom: -100px;
+      right: -80px;
+    }
+
+    /* PHONE */
+
+    .phone {
+      width: 390px;
+      height: 800px;
+      padding: 10px;
+      border-radius: 48px;
+      background: #16191d;
+      box-shadow:
+        0 35px 80px rgba(40, 55, 65, .28),
+        0 8px 20px rgba(40, 55, 65, .18);
+      position: relative;
+      z-index: 2;
+    }
+
+    .phone::before {
+      content: "";
+      position: absolute;
+      inset: 2px;
+      border-radius: 46px;
+      border: 1px solid rgba(255,255,255,.25);
+      pointer-events: none;
+    }
+
+    .screen {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 40px;
+      position: relative;
+      background: linear-gradient(145deg, #e7f7ff, #fff0f7);
+    }
+
+    /* DYNAMIC WALLPAPER */
+
+    .wallpaper {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,.8), transparent 25%),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,.7), transparent 25%),
+        linear-gradient(145deg, #c9eafa, #f8d5e5);
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(4px);
+      opacity: .5;
+      animation: float 7s ease-in-out infinite;
+    }
+
+    .blob.one {
+      width: 230px;
+      height: 230px;
+      background: #a9dcef;
+      top: -70px;
+      right: -70px;
+    }
+
+    .blob.two {
+      width: 200px;
+      height: 200px;
+      background: #f0bfd7;
+      bottom: 50px;
+      left: -80px;
+      animation-delay: -3s;
+    }
+
+    @keyframes float {
+      50% {
+        transform: translate(15px, -20px) scale(1.04);
+      }
+    }
+
+    /* STATUS BAR */
+
+    .status-bar {
+      position: absolute;
+      top: 16px;
+      left: 24px;
+      right: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      color: #243746;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .battery {
+      width: 23px;
+      height: 11px;
+      border: 1.5px solid #263746;
+      border-radius: 4px;
+      padding: 1.5px;
+    }
+
+    .battery::after {
+      content: "";
+      width: 2px;
+      height: 5px;
+      background: #263746;
+      position: absolute;
+      margin-left: 22px;
+      margin-top: 0px;
+      border-radius: 1px;
+    }
+
+    .battery-level {
+      width: 85%;
+      height: 100%;
+      border-radius: 2px;
+      background: #263746;
+    }
+
+    /* LOCK SCREEN */
+
+    .lock-screen {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding-top: 115px;
+      background:
+        linear-gradient(145deg, rgba(191,229,246,.82), rgba(247,207,225,.88));
+      backdrop-filter: blur(15px);
+      transition: .8s cubic-bezier(.77,0,.18,1);
+    }
+
+    .lock-screen.hidden {
+      transform: translateY(-100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .lock-time {
+      font-size: 72px;
+      line-height: 1;
+      font-weight: 300;
+      letter-spacing: -4px;
+    }
+
+    .lock-date {
+      margin-top: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #536977;
+    }
+
+    .lock-title {
+      margin-top: 145px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .lock-subtitle {
+      margin-top: 8px;
+      color: #647887;
+      font-size: 13px;
+    }
+
+    .unlock-btn {
+      margin-top: 28px;
+      border: 0;
+      padding: 13px 25px;
+      border-radius: 30px;
+      background: rgba(255,255,255,.62);
+      color: var(--text);
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(70,80,90,.12);
+      transition: .25s;
+    }
+
+    .unlock-btn:hover {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.85);
+    }
+
+    /* HOME */
+
+    .home {
+      position: absolute;
+      inset: 0;
+      padding: 70px 22px 85px;
+      opacity: 1;
+      transition: .4s;
+    }
+
+    .home-header {
+      margin-bottom: 28px;
+    }
+
+    .home-greeting {
+      font-size: 13px;
+      color: #607482;
+    }
+
+    .home-name {
+      font-size: 28px;
+      font-weight: 750;
+      margin-top: 3px;
+    }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px 14px;
+    }
+
+    .app {
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      font-size: 10px;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .app:hover {
+      transform: translateY(-4px);
+    }
+
+    .app:active {
+      transform: scale(.92);
+    }
+
+    .app-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 17px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 25px;
+      background: rgba(255,255,255,.65);
+      border: 1px solid rgba(255,255,255,.65);
+      box-shadow:
+        0 10px 20px rgba(60,80,90,.12),
+        inset 0 1px 0 rgba(255,255,255,.8);
+      backdrop-filter: blur(10px);
+    }
+
+    .app:nth-child(odd) .app-icon {
+      background: linear-gradient(145deg, rgba(255,255,255,.78), rgba(218,240,250,.7));
+    }
+
+    .app:nth-child(even) .app-icon {
+      background: linear-gradient(145deg, rgba(255,255,255,.78), rgba(250,220,233,.72));
+    }
+
+    /* DOCK */
+
+    .dock {
+      position: absolute;
+      bottom: 18px;
+      left: 20px;
+      right: 20px;
+      height: 72px;
+      border-radius: 25px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background: rgba(255,255,255,.43);
+      border: 1px solid rgba(255,255,255,.7);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 12px 30px rgba(60,80,90,.1);
+    }
+
+    .dock .app-icon {
+      width: 48px;
+      height: 48px;
+      font-size: 21px;
+    }
+
+    /* APP WINDOW */
+
+    .app-window {
+      position: absolute;
+      inset: 0;
+      z-index: 15;
+      padding: 66px 22px 30px;
+      background: rgba(248,252,255,.96);
+      transform: scale(.75);
+      opacity: 0;
+      pointer-events: none;
+      border-radius: 40px;
+      transition: .35s cubic-bezier(.2,.8,.2,1);
+      overflow-y: auto;
+    }
+
+    .app-window.open {
+      transform: scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .app-window::-webkit-scrollbar {
+      width: 0;
+    }
+
+    .window-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 25px;
+    }
+
+    .window-title {
+      font-size: 25px;
+      font-weight: 750;
+    }
+
+    .close-btn {
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 50%;
+      background: #edf4f8;
+      cursor: pointer;
+      font-size: 18px;
+      color: #455967;
+    }
+
+    /* ABOUT */
+
+    .profile-card {
+      padding: 25px;
+      border-radius: 28px;
+      background: linear-gradient(145deg, #dff3fc, #fde8f1);
+      text-align: center;
+      box-shadow: 0 12px 25px rgba(70,90,100,.1);
+    }
+
+    .profile-photo {
+      width: 105px;
+      height: 105px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 5px solid rgba(255,255,255,.8);
+      margin-bottom: 13px;
+      background: #fff;
+    }
+
+    .profile-card h3 {
+      font-size: 21px;
+    }
+
+    .profile-card p {
+      color: #647786;
+      font-size: 13px;
+      margin-top: 5px;
+    }
+
+    .info-list {
+      margin-top: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .info {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: white;
+      border-radius: 16px;
+      font-size: 13px;
+    }
+
+    .info span:last-child {
+      color: #758592;
+    }
+
+    /* GENERAL CARDS */
+
+    .card {
+      background: white;
+      border-radius: 22px;
+      padding: 18px;
+      margin-bottom: 12px;
+      box-shadow: 0 8px 22px rgba(65,85,95,.08);
+    }
+
+    .card h3 {
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    /* GALLERY */
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+    }
+
+    .gallery-item {
+      height: 100px;
+      border: 0;
+      border-radius: 15px;
+      overflow: hidden;
+      cursor: pointer;
+      background: #eaf5fa;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: .3s;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.08);
+    }
+
+    /* MUSIC */
+
+    .music-player {
+      text-align: center;
+      padding: 25px;
+      background: linear-gradient(145deg, #dff3fc, #fde6f0);
+      border-radius: 28px;
+    }
+
+    .album {
+      width: 155px;
+      height: 155px;
+      border-radius: 25px;
+      margin: auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 55px;
+      background: linear-gradient(145deg, #b8dff1, #f1bfd7);
+      box-shadow: 0 15px 25px rgba(70,80,90,.15);
+    }
+
+    .song {
+      margin-top: 18px;
+      font-size: 17px;
+      font-weight: 750;
+    }
+
+    .artist {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .progress {
+      height: 5px;
+      background: rgba(255,255,255,.8);
+      border-radius: 10px;
+      margin: 22px 0 12px;
+      overflow: hidden;
+    }
+
+    .progress span {
+      display: block;
+      width: 42%;
+      height: 100%;
+      background: #779fb5;
+      border-radius: inherit;
+    }
+
+    .music-controls {
+      display: flex;
+      justify-content: center;
+      gap: 22px;
+      align-items: center;
+    }
+
+    .music-controls button {
+      border: 0;
+      background: transparent;
+      font-size: 21px;
+      cursor: pointer;
+    }
+
+    .play {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: white !important;
+      box-shadow: 0 7px 15px rgba(60,70,80,.12);
+    }
+
+    /* DREAMS */
+
+    .dream {
+      padding: 18px;
+      border-radius: 22px;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #e6f5fb, #fff0f6);
+    }
+
+    .dream-icon {
+      font-size: 25px;
+      margin-bottom: 8px;
+    }
+
+    .dream h3 {
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+
+    .dream p {
+      color: #71818c;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* MESSAGES */
+
+    .message {
+      max-width: 82%;
+      padding: 12px 15px;
+      border-radius: 18px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .message.left {
+      background: #edf4f7;
+      border-bottom-left-radius: 5px;
+    }
+
+    .message.right {
+      background: #f5dbe7;
+      margin-left: auto;
+      border-bottom-right-radius: 5px;
+    }
+
+    /* SETTINGS */
+
+    .setting {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: white;
+      border-radius: 17px;
+      margin-bottom: 10px;
+    }
+
+    .setting-name {
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .toggle {
+      width: 43px;
+      height: 24px;
+      border: 0;
+      border-radius: 20px;
+      background: #bddceb;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .toggle::after {
+      content: "";
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      transition: .2s;
+      box-shadow: 0 2px 5px rgba(0,0,0,.12);
+    }
+
+    .toggle.off {
+      background: #d7dce0;
+    }
+
+    .toggle.off::after {
+      right: 22px;
+    }
+
+    /* NOTIFICATION */
+
+    .notification {
+      position: absolute;
+      top: 48px;
+      left: 18px;
+      right: 18px;
+      z-index: 30;
+      padding: 13px 15px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(15px);
+      box-shadow: 0 12px 30px rgba(50,70,80,.15);
+      display: flex;
+      gap: 11px;
+      align-items: center;
+      transform: translateY(-100px);
+      opacity: 0;
+      transition: .5s;
+    }
+
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .notification-icon {
+      width: 35px;
+      height: 35px;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, #c5e6f4, #f4cada);
+    }
+
+    .notification-text strong {
+      display: block;
+      font-size: 11px;
+    }
+
+    .notification-text span {
+      display: block;
+      color: #6f7e88;
+      font-size: 10px;
+      margin-top: 2px;
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 500px) {
+      body {
+        align-items: stretch;
+      }
+
+      .phone {
+        width: 100vw;
+        height: 100vh;
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .phone::before {
+        display: none;
+      }
+
+      .screen {
+        border-radius: 0;
+      }
+
+      .app-window {
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="background-orb orb-blue"></div>
+  <div class="background-orb orb-pink"></div>
+
+  <div class="phone">
+    <div class="screen">
+
+      <div class="wallpaper">
+        <div class="blob one"></div>
+        <div class="blob two"></div>
+      </div>
+
+      <!-- STATUS BAR -->
+      <div class="status-bar">
+        <span id="statusTime">15:07</span>
+
+        <div class="status-icons">
+          <span>⌁</span>
+          <span>WiFi</span>
+          <div class="battery">
+            <div class="battery-level"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTIFICATION -->
+      <div class="notification" id="notification">
+        <div class="notification-icon">💗</div>
+        <div class="notification-text">
+          <strong>My Phone</strong>
+          <span>Someone is exploring your world...</span>
+        </div>
+      </div>
+
+      <!-- LOCK SCREEN -->
+      <section class="lock-screen" id="lockScreen">
+        <div class="lock-time" id="lockTime">15:07</div>
+        <div class="lock-date" id="lockDate">Monday, September 29</div>
+
+        <div class="lock-title">A little piece of my world</div>
+        <div class="lock-subtitle">Welcome to my phone ♡</div>
+
+        <button class="unlock-btn" onclick="unlockPhone()">
+          Tap to Unlock
+        </button>
+      </section>
+
+      <!-- HOME SCREEN -->
+      <main class="home">
+
+        <div class="home-header">
+          <div class="home-greeting">Welcome back 👋🏻</div>
+          <div class="home-name">My Little World</div>
+        </div>
+
+        <div class="app-grid">
+
+          <button class="app" onclick="openApp('about')">
+            <div class="app-icon">👤</div>
+            <span>About Me</span>
+          </button>
+
+          <button class="app" onclick="openApp('gallery')">
+            <div class="app-icon">📸</div>
+            <span>Gallery</span>
+          </button>
+
+          <button class="app" onclick="openApp('music')">
+            <div class="app-icon">🎧</div>
+            <span>Music</span>
+          </button>
+
+          <button class="app" onclick="openApp('favorites')">
+            <div class="app-icon">💗</div>
+            <span>Favorites</span>
+          </button>
+
+          <button class="app" onclick="openApp('school')">
+            <div class="app-icon">🎓</div>
+            <span>School</span>
+          </button>
+
+          <button class="app" onclick="openApp('achievements')">
+            <div class="app-icon">⭐</div>
+            <span>Achievements</span>
+          </button>
+
+          <button class="app" onclick="openApp('dreams')">
+            <div class="app-icon">🌙</div>
+            <span>Dreams</span>
+          </button>
+
+          <button class="app" onclick="openApp('messages')">
+            <div class="app-icon">💬</div>
+            <span>Messages</span>
+          </button>
+
+          <button class="app" onclick="openApp('settings')">
+            <div class="app-icon">⚙️</div>
+            <span>Settings</span>
+          </button>
+
+        </div>
+
+        <div class="dock">
+          <button class="app" onclick="openApp('about')">
+            <div class="app-icon">👤</div>
+          </button>
+
+          <button class="app" onclick="openApp('gallery')">
+            <div class="app-icon">📷</div>
+          </button>
+
+          <button class="app" onclick="openApp('music')">
+            <div class="app-icon">🎵</div>
+          </button>
+
+          <button class="app" onclick="showNotification()">
+            <div class="app-icon">🔔</div>
+          </button>
+        </div>
+      </main>
+
+      <!-- ABOUT -->
+      <section class="app-window" id="about">
+        <div class="window-header">
+          <div class="window-title">About Me</div>
+          <button class="close-btn" onclick="closeApp('about')">×</button>
+        </div>
+
+        <div class="profile-card">
+          <!-- GANTI src DENGAN FOTO KAMU -->
+          <img
+            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80"
+            class="profile-photo"
+            alt="Profile"
+          />
+
+          <h3>Your Name</h3>
+          <p>Just a little human with big dreams ✨</p>
+        </div>
+
+        <div class="info-list">
+          <div class="info">
+            <span>Nama</span>
+            <span>Your Name</span>
+          </div>
+
+          <div class="info">
+            <span>Usia</span>
+            <span>14 Tahun</span>
+          </div>
+
+          <div class="info">
+            <span>Sekolah</span>
+            <span>Your School</span>
+          </div>
+
+          <div class="info">
+            <span>Hobi</span>
+            <span>Your Hobby</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px;">
+          <h3>A little about me</h3>
+          <p>
+            Halo! Aku adalah seseorang yang suka mencoba hal baru,
+            mengabadikan momen, dan mempunyai banyak mimpi yang ingin
+            diwujudkan.
+          </p>
+        </div>
+      </section>
+
+      <!-- GALLERY -->
+      <section class="app-window" id="gallery">
+        <div class="window-header">
+          <div class="window-title">Gallery</div>
+          <button class="close-btn" onclick="closeApp('gallery')">×</button>
+        </div>
+
+        <div class="gallery">
+          <button class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=500&q=80">
+          </button>
+
+          <button class="gal
